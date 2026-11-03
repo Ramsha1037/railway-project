@@ -1,0 +1,6 @@
+railway
+main
+main.dSYM/
+.vscode/
+*.o
+.DS_Store
