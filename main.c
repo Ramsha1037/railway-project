@@ -52,7 +52,7 @@ int main()
         //using switch for using features
         switch(choice)
         {
-            case 1: 
+            case 1:  // adding trains
             if(traincount < maxtrains)
             {
                printf("Add Train\n");
@@ -75,8 +75,24 @@ int main()
             else
             printf("Traincount exceeded");
             break;
-
+            
+            case 2: //displaying trains
+            
+            if(traincount == 0)
+            printf("No Trains Available\n");
+            else
+            {
+                for(int i =0; i < traincount; i++)
+                {
+                    printf("Train Name = %s\n" , trains[i].tname );
+                    printf("Train Number = %d\n" , trains[i].tnumber );
+                    printf("From %s to %s \n" , trains[i].source , trains[i].destination);
+                    printf("Train fare = %.2f\n" , trains[i].fare );
+                }
+            }
+            break;
         }
+
 
 
     } while (choice!=7);
