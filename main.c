@@ -30,10 +30,11 @@
 int main()
 {
     
-     int choice;
+     int choice ; int found =0; 
     struct Train trains[maxtrains];
     int traincount = 0;
-
+    char s[100] , d[100];
+    
 
     do
     {
@@ -66,11 +67,7 @@ int main()
                scanf("%f" , &trains[traincount].fare );
                printf("Enter train source = \n");
                scanf(" %[^\n]", trains[traincount].source);
-               
-
                traincount++;
-               
-               
             }
             else
             printf("Traincount exceeded");
@@ -90,6 +87,31 @@ int main()
                     printf("Train fare = %.2f\n" , trains[i].fare );
                 }
             }
+            break;
+
+            case 3: //search train by source and destination
+            
+            printf("Enter source: ");
+            scanf(" %[^\n]", s);
+            printf("Enter destination: ");
+            scanf(" %[^\n]", d);
+
+
+            for(int i=0; i < traincount; i++)
+            {
+                if( (strcmp(trains[i].source,s ))==0&&  (strcmp( trains[i].destination,d ))==0)
+                {
+
+                    printf("Train Name = %s\n" , trains[i].tname );
+                    printf("Train Number = %d\n" , trains[i].tnumber );
+                    printf("From %s to %s \n" , trains[i].source , trains[i].destination);
+                    printf("Train fare = %.2f\n" , trains[i].fare );
+                    found =1;
+                }
+                
+            }
+            if(found==0)
+            printf("No train found\n");
             break;
         }
 
