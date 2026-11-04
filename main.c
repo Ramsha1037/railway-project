@@ -3,6 +3,7 @@
 
 #define maxtrains 20
 #define maxseats 15
+#define maxpassengers 600
 
 
     struct Passenger
@@ -32,11 +33,14 @@ int main()
     
      int choice ; int found =0; 
     struct Train trains[maxtrains];
+    struct Passenger passengers[maxpassengers];
     int traincount = 0;
     char s[100] , d[100];
     int tn;
-    
-
+    int passengercount =0;
+    int seat , t;
+    int nextPNR = 1001;   
+    int freeCount=0;  
     do
     {
        
@@ -121,11 +125,17 @@ int main()
             break;
 
 
+          
+
+          
            case 4:
-           found =0;
+           found = 0;
+           freeCount = 0;
+           t = -1;
            printf("Enter train number =\n");
            scanf("%d" , &tn);
 
+           // seat layout
            for(int i=0; i<traincount ; i++)
            {
             if(tn == trains[i].tnumber)
@@ -133,17 +143,77 @@ int main()
                for(int j =0; j<maxseats ; j++)
                {
                 if(trains[i].seat_status[j] == 0)
+                {
                  printf("Seat %d: free\n", j + 1);
+                 freeCount++;
+                }
                 else
-                printf("Seat %d: booked\n", j + 1);
+                 printf("Seat %d: booked\n", j + 1);
                }
                found = 1;
+               t = i;
             }
            }
-           if(found ==0)
-           printf("Invalid Train Number\n");
-           break;
 
+           if(found == 0)
+           {
+            printf("Invalid Train Number\n");
+            break;
+           }
+
+           // booking
+           if (passengercount >= maxpassengers)
+           {
+            printf("Passenger list is full.\n");
+            break;
+           }
+
+           if (freeCount == 0)
+           {
+            printf("Train is full.\n");
+            break;
+           }
+
+           do
+           {
+            printf("Choose a free seat = \n");
+            scanf("%d" , &seat);
+
+            if (seat < 1 || seat > maxseats)
+                printf("Invalid seat number.\n");
+            else if (trains[t].seat_status[seat-1] != 0)
+                printf("Seat is booked.\n");
+
+           } while (seat < 1 || seat > maxseats || trains[t].seat_status[seat-1] != 0);
+
+           printf("Enter passenger name: ");
+           scanf(" %[^\n]", passengers[passengercount].name);
+           printf("Enter age: ");
+           scanf("%d", &passengers[passengercount].age);
+           printf("Enter journey date (dd-mm-yyyy): ");
+           scanf(" %14s", passengers[passengercount].journey_date);
+
+           trains[t].seat_status[seat-1] = 1;
+
+           passengers[passengercount].PNR = nextPNR;
+           passengers[passengercount].train_number = tn;
+           passengers[passengercount].seat = seat;
+           passengers[passengercount].status = 0;
+
+           // ticket
+           printf("\n====== TICKET ======\n");
+           printf("PNR: %d\n", passengers[passengercount].PNR);
+           printf("Name: %s\n", passengers[passengercount].name);
+           printf("Train: %s (%d)\n", trains[t].tname, tn);
+           printf("From %s to %s\n", trains[t].source, trains[t].destination);
+           printf("Seat: %d\n", seat);
+           printf("Date: %s\n", passengers[passengercount].journey_date);
+           printf("Fare: %.2f\n", trains[t].fare);
+           printf("====================\n");
+
+           passengercount++;
+           nextPNR++;
+           break;
 
         }
 
