@@ -27,6 +27,7 @@
       float fare;
       int seat_status[maxseats];
       char source[100];
+      char journey_date[15];     
     };
 int main()
 {
@@ -38,7 +39,7 @@ int main()
     char s[100] , d[100];
     int tn ,pnr;
     int passengercount =0;
-    int seat , t;
+    int seat , t ,p;
     int nextPNR = 1001;   
     int freeCount=0;  
     do
@@ -72,6 +73,8 @@ int main()
                scanf("%f" , &trains[traincount].fare );
                printf("Enter train source = \n");
                scanf(" %[^\n]", trains[traincount].source);
+               printf("Enter journey date (dd-mm-yyyy) = \n");
+               scanf(" %14s", trains[traincount].journey_date);
                
                for (int i = 0; i < maxseats; i++)
                {
@@ -95,6 +98,7 @@ int main()
                     printf("Train Number = %d\n" , trains[i].tnumber );
                     printf("From %s to %s \n" , trains[i].source , trains[i].destination);
                     printf("Train fare = %.2f\n" , trains[i].fare );
+                    printf("Journey Date = %s\n", trains[i].journey_date);
                 }
             }
             break;
@@ -116,6 +120,7 @@ int main()
                     printf("Train Number = %d\n" , trains[i].tnumber );
                     printf("From %s to %s \n" , trains[i].source , trains[i].destination);
                     printf("Train fare = %.2f\n" , trains[i].fare );
+                    printf("Journey Date = %s\n", trains[i].journey_date);
                     found =1;
                 }
                 
@@ -140,6 +145,7 @@ int main()
            {
             if(tn == trains[i].tnumber)
             {
+                printf("Journey Date = %s\n", trains[i].journey_date);
                for(int j =0; j<maxseats ; j++)
                {
                 if(trains[i].seat_status[j] == 0)
@@ -190,8 +196,7 @@ int main()
            scanf(" %[^\n]", passengers[passengercount].name);
            printf("Enter age: ");
            scanf("%d", &passengers[passengercount].age);
-           printf("Enter journey date (dd-mm-yyyy): ");
-           scanf(" %14s", passengers[passengercount].journey_date);
+           
 
            trains[t].seat_status[seat-1] = 1;
 
@@ -199,6 +204,7 @@ int main()
            passengers[passengercount].train_number = tn;
            passengers[passengercount].seat = seat;
            passengers[passengercount].status = 0;
+           strcpy(passengers[passengercount].journey_date, trains[t].journey_date);
 
            // ticket
            printf("\n====== TICKET ======\n");
@@ -215,7 +221,45 @@ int main()
            nextPNR++;
            break;
 
+           
+           case 5:
+           printf("Enter PNR = \n");
+           scanf("%d", &pnr);
 
+            p = 0;
+           found = 0;
+           for (int i = 0; i < passengercount; i++)
+          {
+           if (passengers[i].PNR == pnr)
+           {
+            p = i;
+            found = 1;
+           }
+          }
+
+         if (found == 0)
+         {
+          printf("PNR not found.\n");
+          break;
+         }
+         if (passengers[p].status == 2)
+         {
+          printf("Ticket already cancelled.\n");
+          break;
+         }
+
+          t = 0;
+          for (int i = 0; i < traincount; i++)
+         {
+           if (trains[i].tnumber == passengers[p].train_number)
+            t = i;
+          }
+
+         trains[t].seat_status[passengers[p].seat - 1] = 0;
+         passengers[p].status = 2;
+
+         printf("Ticket cancelled.\n");
+         break;
 
            case 6:
            printf("Enter PNR = \n");
