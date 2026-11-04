@@ -36,7 +36,7 @@ int main()
     struct Passenger passengers[maxpassengers];
     int traincount = 0;
     char s[100] , d[100];
-    int tn;
+    int tn ,pnr;
     int passengercount =0;
     int seat , t;
     int nextPNR = 1001;   
@@ -215,8 +215,41 @@ int main()
            nextPNR++;
            break;
 
-        }
 
+
+           case 6:
+           printf("Enter PNR = \n");
+           scanf("%d", &pnr);
+           found = 0;
+
+           for (int i = 0; i < passengercount; i++)
+          {
+           if (passengers[i].PNR == pnr)
+          {
+            printf("Name = %s\n", passengers[i].name);
+            printf("Age = %d\n", passengers[i].age);
+            printf("Train Number = %d\n", passengers[i].train_number);
+            printf("Seat = %d\n", passengers[i].seat);
+            printf("Journey Date = %s\n", passengers[i].journey_date);
+
+            if (passengers[i].status == 0)
+                printf("Status = Confirmed\n");
+            else if (passengers[i].status == 1)
+                printf("Status = Waiting\n");
+            else
+                printf("Status = Cancelled\n");
+
+            found = 1;
+          }
+          }
+
+          if (found == 0)
+          printf("PNR not found.\n");
+
+          break;
+
+        }
+   
 
 
     } while (choice!=7);
