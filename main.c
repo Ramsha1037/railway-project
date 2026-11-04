@@ -24,7 +24,7 @@
       char tname[100];
       char destination[100];
       float fare;
-      int seat_status;
+      int seat_status[maxseats];
       char source[100];
     };
 int main()
@@ -34,6 +34,7 @@ int main()
     struct Train trains[maxtrains];
     int traincount = 0;
     char s[100] , d[100];
+    int tn;
     
 
     do
@@ -47,7 +48,7 @@ int main()
         printf(" 5:Cancel Train Tickets \n");
         printf(" 6:Check PNR and booking status \n");
         printf(" 7:EXIT \n");
-
+        printf("Enter your choice =\n");
         scanf("%d" , &choice);
 
         //using switch for using features
@@ -67,7 +68,12 @@ int main()
                scanf("%f" , &trains[traincount].fare );
                printf("Enter train source = \n");
                scanf(" %[^\n]", trains[traincount].source);
-               traincount++;
+               
+               for (int i = 0; i < maxseats; i++)
+               {
+                 trains[traincount].seat_status[i] = 0;
+                }
+                traincount++;
             }
             else
             printf("Traincount exceeded");
@@ -95,7 +101,7 @@ int main()
             scanf(" %[^\n]", s);
             printf("Enter destination: ");
             scanf(" %[^\n]", d);
-
+            found =0;
 
             for(int i=0; i < traincount; i++)
             {
@@ -113,13 +119,39 @@ int main()
             if(found==0)
             printf("No train found\n");
             break;
+
+
+           case 4:
+           found =0;
+           printf("Enter train number =\n");
+           scanf("%d" , &tn);
+
+           for(int i=0; i<traincount ; i++)
+           {
+            if(tn == trains[i].tnumber)
+            {
+               for(int j =0; j<maxseats ; j++)
+               {
+                if(trains[i].seat_status[j] == 0)
+                 printf("Seat %d: free\n", j + 1);
+                else
+                printf("Seat %d: booked\n", j + 1);
+               }
+               found = 1;
+            }
+           }
+           if(found ==0)
+           printf("Invalid Train Number\n");
+           break;
+
+
         }
 
 
 
     } while (choice!=7);
 
-
+    return 0;
     
 
 
