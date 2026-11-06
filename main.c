@@ -279,6 +279,158 @@ float calcrefund(int days)
 
 }
 
+void saveData(struct Train trains[], struct Passenger passengers[], int traincount, int passengercount, int nextPNR)
+{
+    FILE *fp;
+
+    fp = fopen("trains.txt", "w");
+
+    if(fp == NULL)
+    {
+        printf("Error saving train data.\n");
+        return;
+    }
+
+    fprintf(fp, "%d\n", traincount);
+
+    for(int i = 0; i < traincount; i++)
+    {
+        fprintf(fp, "%d\n", trains[i].tnumber);
+        fprintf(fp, "%s\n", trains[i].tname);
+        fprintf(fp, "%s\n", trains[i].source);
+        fprintf(fp, "%s\n", trains[i].destination);
+        fprintf(fp, "%.2f\n", trains[i].fare);
+        fprintf(fp, "%s\n", trains[i].journey_date);
+
+        for(int j = 0; j < maxseats; j++)
+        {
+            fprintf(fp, "%d ", trains[i].seat_status[j]);
+        }
+        fprintf(fp, "\n");
+    }
+
+    fclose(fp);
+
+
+    fp = fopen("passengers.txt", "w");
+
+    if(fp == NULL)
+    {
+        printf("Error saving passenger data.\n");
+        return;
+    }
+
+    fprintf(fp, "%d %d\n", passengercount, nextPNR);
+
+    for(int i = 0; i < passengercount; i++)
+    {
+        fprintf(fp, "%s\n", passengers[i].name);
+        fprintf(fp, "%d %d %d %d %d\n",
+                passengers[i].age,
+                passengers[i].PNR,
+                passengers[i].train_number,
+                passengers[i].seat,
+                passengers[i].status);
+        fprintf(fp, "%s\n", passengers[i].journey_date);
+    }
+
+    fclose(fp);
+
+    printf("Data saved successfully!\n");
+}
+
+void loadData(struct Train trains[], struct Passenger passengers[],  int *traincount, int *passengercount, int *nextPNR)
+{
+    
+    FILE *fp;
+
+    *traincount = 0;
+    *passengercount = 0;
+    *nextPNR = 1001;
+
+    fp = fopen("trains.txt", "r");
+
+    if(fp != NULL)
+    {
+        if(fscanf(fp, "%d", traincount) != 1 ||
+           *traincount < 0 || *traincount > maxtrains)
+        {
+            printf("Invalid train file.\n");
+            *traincount = 0;
+            fclose(fp);
+            return;
+        }
+
+        for(int i = 0; i < *traincount; i++)
+        {
+            if(fscanf(fp, "%d", &trains[i].tnumber) != 1 ||  fscanf(fp, " %99[^\n]", trains[i].tname) != 1 ||  fscanf(fp, " %99[^\n]", trains[i].source) != 1 || fscanf(fp, " %99[^\n]", trains[i].destination) != 1 ||   fscanf(fp, "%f", &trains[i].fare) != 1 ||   fscanf(fp, " %14s", trains[i].journey_date) != 1)
+            {
+                printf("Incomplete train data.\n");
+                *traincount = 0;
+                fclose(fp);
+                return;
+            }
+
+            for(int j = 0; j < maxseats; j++)
+            {
+                if(fscanf(fp, "%d", &trains[i].seat_status[j]) != 1 ||  (trains[i].seat_status[j] != 0 &&   trains[i].seat_status[j] != 1))
+                {
+                    printf("Invalid seat data.\n");
+                    *traincount = 0;
+                    fclose(fp);
+                    return;
+                }
+            }
+        }
+
+        fclose(fp);
+    }
+
+    fp = fopen("passengers.txt", "r");
+
+    if(fp != NULL)
+    {
+        if(fscanf(fp, "%d %d", passengercount, nextPNR) != 2 ||
+           *passengercount < 0 ||
+           *passengercount > maxpassengers ||
+           *nextPNR < 1001)
+        {
+            printf("Invalid passenger file.\n");
+            *passengercount = 0;
+            *nextPNR = 1001;
+            fclose(fp);
+            return;
+        }
+
+        for(int i = 0; i < *passengercount; i++)
+        {
+            if(fscanf(fp, " %99[^\n]", passengers[i].name) != 1 ||  fscanf(fp, "%d %d %d %d %d",   &passengers[i].age, &passengers[i].PNR,  &passengers[i].train_number, &passengers[i].seat,     &passengers[i].status) != 5 || fscanf(fp, " %14s", passengers[i].journey_date) != 1)
+            {
+                printf("Incomplete passenger data.\n");
+                *passengercount = 0;
+                *nextPNR = 1001;
+                fclose(fp);
+                return;
+            }
+
+            if(passengers[i].status < 0 || passengers[i].status > 2 ||  passengers[i].seat < 0 || passengers[i].seat > maxseats)
+            {
+                printf("Invalid passenger record.\n");
+                *passengercount = 0;
+                *nextPNR = 1001;
+                fclose(fp);
+                return;
+            }
+        }
+
+        fclose(fp);
+    }
+
+    printf("Data loaded successfully!\n");
+}
+
+
+
 int main()
 {
     int choice;
@@ -292,6 +444,7 @@ int main()
     int seat, t, p;
     int nextPNR = 1001;
     float percentage, refund;
+    loadData(trains, passengers, &traincount, &passengercount, &nextPNR);
     do
     {
         printf("\n====== SMART RAILWAY RESERVATION AND WAITLIST MANAGEMENT SYSTEM ======\n");
@@ -481,7 +634,12 @@ int main()
                     printf("Invalid date entered.\n");
                     break;
                 }
-
+                
+                if (days < 0)
+                {
+                printf("Error: Journey date has already passed.\n");
+                break;
+                } 
 
                 // Calculate refund
     
@@ -568,6 +726,7 @@ int main()
 
 
             case 7:
+                saveData(trains, passengers, traincount,passengercount, nextPNR);
                 printf("Exiting program...\n");
                 break;
             default:
